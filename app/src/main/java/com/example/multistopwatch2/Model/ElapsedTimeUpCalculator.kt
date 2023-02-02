@@ -1,14 +1,20 @@
 package com.example.multistopwatch2.Model
 
+import android.R
+import android.os.Handler
+import android.widget.TextView
 import kotlinx.coroutines.*
+//import org.junit.rules.Timeout.seconds
+import java.util.concurrent.Executor
+
 
 // import com.example.multistopwatch2.Model.StopwatchState.Running
 
 interface ElapsedTimeUpCalculator {
     fun calculateTimeUp(currentTime: Long): Long
-    fun startCalculate()
-    fun stopCalculate()
-    fun pauseCalculate()
+    //fun startCalculate()
+   //fun stopCalculate()
+    //fun pauseCalculate()
 
     class Base(private var time: Long) : ElapsedTimeUpCalculator {
         val scope = MainScope() // CoroutineScope() //
@@ -24,21 +30,13 @@ interface ElapsedTimeUpCalculator {
             return time++
         }
 
-        override fun startCalculate() {
-            TODO("Not yet implemented")
-        }
-
-        override fun stopCalculate() {
-            TODO("Not yet implemented")
-        }
-
-        override fun pauseCalculate() {
-            TODO("Not yet implemented")
-        }
 
     }
-
 }
+
+
+
+
 
 
 
