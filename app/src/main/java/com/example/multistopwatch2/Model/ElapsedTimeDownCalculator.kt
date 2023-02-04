@@ -13,6 +13,11 @@ interface ElapsedTimeDownCalculator {
     fun pauseCalculate()
     fun stopCalculate()
 
+    // val timer = ElapsedTimeDownCalculator.Base()
+    // timer.startCalculateTimeDown()
+    // timer.pauseCalculate()
+    // timer.stopCalculate()
+
     class Base(): ElapsedTimeDownCalculator {
         private var totalSeconds = 10
 
