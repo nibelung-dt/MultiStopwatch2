@@ -4,17 +4,22 @@ package com.example.multistopwatch2.Model
 import android.app.*
 import android.content.Intent
 import android.graphics.Color
-import android.os.Binder
-import android.os.Build
-import android.os.IBinder
+import android.os.*
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.example.multistopwatch2.MainActivity
 //import com.example.multistopwatch2.Model.SingletonServiceState.isServiceRunning2
 import com.example.multistopwatch2.R
+import com.example.multistopwatch2.ViewModels.StopwatchViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -25,6 +30,18 @@ object SingletonServiceManager {
 
 class StopwatchService : Service() {
 
+     // private val model = StopwatchViewModel //viewModels  by StopwatchViewModel()
+   // private val model: StopwatchViewModel by viewModels { StopwatchViewModel.Factory }
+    companion object {
+       private val model = StopwatchViewModel
+       // var count = 0
+         var count = model.seconds
+           //  MutableLiveData<Int>(0)
+    }
+    // livedata
+    // лучше через репозиторий
+// LockoutService.timeLeftInSeconds.observe(viewLifecycleOwner, Observer {...})
+
     var randomNumber = 0
 
     inner class MyBinder : Binder() {
@@ -33,11 +50,6 @@ class StopwatchService : Service() {
 
     private val binder = MyBinder()
 
-
-
-    companion object {
-        var count = 0
-    }
 
     override fun onBind(p0: Intent?): IBinder? {
         return binder
@@ -48,24 +60,38 @@ class StopwatchService : Service() {
         SingletonServiceManager.isServiceRunning = true
         Toast.makeText(this, "Служба создана", Toast.LENGTH_SHORT).show()
 
+        val nameObserver = Observer<String> { newName -> timer1.text = newName }
+/*
+        model.seconds.observe(this, { newName ->
+            // Update the UI. In this case, a TextView.
+            nameTextView.text = newName
+        })
+ */
 
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        Toast.makeText(this, "Служба запущена", Toast.LENGTH_SHORT).show()
-        count = 100
+        val stopwatchHandler = ElapsedTimeUpCalculator.BaseHandler(count.toLong())
+        stopwatchHandler.calculateTimeUp(count.toLong())
 
-        thread {
-            while (true) {
-                randomNumber = (1..100).random()
-                Log.d("MyService", "Generated randomNumber = $randomNumber")
-                Thread.sleep(5000)
+        Toast.makeText(this, "Служба запущена", Toast.LENGTH_SHORT).show()
+        // count = 100
+        // count = (1..100).random()
+
+        val handler = Handler(Looper.myLooper()!!) // .getMainLooper())
+        handler.run {
+            while (count <= 10) {
+                count++
             }
         }
-        return START_STICKY
 
-        // return super.onStartCommand(intent, flags, startId)
+
+        //startStopwatch()
+
+        //return START_STICKY
+
+         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onDestroy() {
@@ -79,9 +105,60 @@ class StopwatchService : Service() {
 
     }*/
 
+
+    fun startStopwatchHandler() {
+        val handler = Handler(Looper.myLooper()!!) // .getMainLooper())
+        handler.run {
+            while (count <= 10) {
+                count++
+            }
+        }
+    }
+
+
+    fun startStopwatchCoroutine() = CoroutineScope(Dispatchers.IO).launch {
+       // CoroutineScope(Dispatchers.Main).launch {
+            while (count <= 10) {
+                count++
+            }
+        /*
+       private suspend fun startStopwatch1() {
+           withContext(Dispatchers.IO) {
+               while (count <= 10) {
+                   count++
+               }
+           }
+       */
+    }
+
+    fun startStopwatchThread() {
+        thread {
+            //while (true) {
+                count = (1..100).random()
+                Log.d("MyService", "Generated randomNumber = $count")
+                Toast.makeText(this, "Случайное число: $count", Toast.LENGTH_SHORT).show()
+                Thread.sleep(5000)
+
+        }
+    }
+
+
 }
 
 // stopService()
+
+
+/*
+private fun startStopwatch() = CoroutineScope(Dispatchers.IO).launch {
+    loadEmails()
+    CoroutineScope(Dispatchers.Main).launch {
+        emailView.setAdapter(ArrayAdapter<Any?>(applicationContext,
+                android.R.layout.simple_dropdown_item_1line, getEmails()))
+    }
+}
+
+ */
+
     /*
     companion object {
         // Channel ID for notifications

@@ -2,6 +2,7 @@ package com.example.multistopwatch2.Model
 
 import android.R
 import android.os.Handler
+import android.os.Looper
 import android.widget.TextView
 import kotlinx.coroutines.*
 //import org.junit.rules.Timeout.seconds
@@ -29,7 +30,19 @@ interface ElapsedTimeUpCalculator {
             }
             return time++
         }
+    }
 
+    class BaseHandler(private var time: Long) : ElapsedTimeUpCalculator {
+        override fun calculateTimeUp(currentTime: Long): Long {
+            val handler = Handler(Looper.myLooper()!!) // .getMainLooper())
+            handler.run {
+                while (time <= 10) {
+                    time++
+                    return time
+                }
+            }
+            return time
+        }
 
     }
 }

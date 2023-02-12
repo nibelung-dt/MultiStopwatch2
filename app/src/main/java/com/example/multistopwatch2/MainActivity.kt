@@ -7,9 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.databinding.DataBindingUtil
 import com.example.multistopwatch2.Model.SingletonServiceManager
 import com.example.multistopwatch2.Model.StopwatchService
 import com.example.multistopwatch2.Model.StopwatchService.Companion.count
+import com.example.multistopwatch2.ViewModels.StopwatchViewModel
+import com.example.multistopwatch2.databinding.ActivityMainBinding
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -18,10 +22,22 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
+    private val myViewModel: StopwatchViewModel by viewModels()
+    //private val myViewModel = StopwatchViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        //setContentView(R.layout.activity_main)
+
+        val binding : ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
+        //Specify this activity as the lifecycleOwner for Data Binding
+        binding.lifecycleOwner = this
+
+        // Pass the ViewModel into the binding
+        binding.viewmodel = myViewModel
+
+
 
         val serviceClass = StopwatchService::class.java
         val serviceClass2 = StopwatchService::class.java
@@ -34,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         val button = findViewById<TextView>(R.id.button)
         val button2 = findViewById<TextView>(R.id.button2)
 
+       // timer1.setText("00:00")
 
         button.setOnClickListener {
             if (SingletonServiceManager.isServiceRunning == false) {
